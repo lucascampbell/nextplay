@@ -12,3 +12,17 @@
  *= require.ui.all
  *= require_tree .
  */
+
+ .betzone{
+ 	margin-top:20px;
+ }
+
+ .yourselection{
+ 	padding-left:10%;
+ 	font-size:24px;
+ }
+
+ .yourscore{
+ 	padding-left:10%;
+ 	font-size:24px;
+ }

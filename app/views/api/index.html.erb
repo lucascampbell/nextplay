@@ -1,13 +1,21 @@
 <div class='span12'>
-  <button class='btn btn-primary' id="poll" style='margin-bottom:10px'>Get Play</button>
-  <table class='table table-striped' id="game-summary">
+  <h3><%=Api.season[:season]%> Season Week <%=Api.season[:week]%>
+  <table class='table table-striped' id="schedule">
     <tr>
-      <th>Team</th>
-      <th>Game Clock</th>
-      <th>Play</th>
-      <th>Down</th>
-      <th>ToGo</th>
-      <th>Yardline</th>
-    </tr>
+        <th>Home</th>
+        <th>Away</th>
+        <th>Network</th>
+        <th>Satellite</th>
+        <th>Scheduled</th>
+      </tr>
+    <%@schedule.each do |s|%>
+      <tr id="<%=s[:home]%>-<%=s[:away]%>">
+        <td><%=s[:home]%></td>
+        <td><%=s[:away]%></td>
+        <td><%=s[:network]%></td>
+        <td><%=s[:satellite]%></td>
+        <td><%=s[:scheduled]%></td>
+      </tr>
+    <%end%>
   </table>
 </div>

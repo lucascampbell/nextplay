@@ -1,0 +1,51 @@
+<div class="span12">
+	<h3><span id='awayscore'></span>&nbsp;<span id="awayteam"><%=@home.upcase%></span>&nbsp;at&nbsp;<span id='homescore'></span>&nbsp;<span id='hometeam'><%=@away.upcase%></span></h3>
+	<div class='subheader well'>
+		<b>Last Play</b><br/>
+		<div id='summary'></div>
+	</div>
+	<div class='subheader well'>
+		<b>Next Play</b><br/>
+		<div id='nextplay'></div>
+	</div>
+	<div class='betzone'>
+		<a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>
+	</div>
+	<div class='alert alert-warning' style='margin-top:20px'>
+		Your selection:<span class='yourselection'></span>
+	</div>
+	<div class='alert alert-success' style='margin-top:20px'>
+		Your score:<span class='yourscore'>0</span>
+	</div>
+</div>
+
+<script type='text/javascript'>
+  var socket = io.connect('http://localhost:3003');
+  socket.on('<%=@home%>/<%=@away%>', function (data) {
+  console.log(data);
+  $("#awayscore").html(data.awayscore);
+  $("#homescore").html(data.homescore);
+  $("#summary").html(data.previousplay);
+  $("#nextplay").html(data.nextplay);
+  var score = $("#yourscore").html();
+	var yourselection = $("#yourselection").html();
+	if((data.play == 'rush' || data.play == 'pass') && yourselection !== undefined){
+	  if(data.play == yourselection)
+			$("#yourselection").html(yourselection + 2);
+		else
+			$("#yourselection").html(yourselection - 1);
+		$("#yourselection").html("");
+	}
+    //socket.emit('my other event', { my: 'data' });
+  });
+  $("#run").click(function(e){
+  	e.preventDefault();
+  	$(".yourselection").html("Run");
+  	return false;
+  })
+  $("#pass").click(function(e){
+  	e.preventDefault();
+  	$(".yourselection").html("Pass");
+  	return false;
+  })
+</script>

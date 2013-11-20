@@ -5,7 +5,8 @@ Nextplay::Application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'api#index'
   get 'api/poll_play' => 'api#poll_play'
-
+  get 'api/game/:home/:away' => 'api#game'
+  get 'api/index' => 'api#index'
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
