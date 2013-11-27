@@ -11,9 +11,8 @@ class Api
   end
 
   def self.get_schedule
-    puts "scehdule is #{LIVE_SCHEDULE}"
     schedule = []
-    doc        = Nokogiri::HTML(RestClient.get(LIVE_SCHEDULE).body)
+    doc        = Nokogiri::HTML(RestClient.get(TEST_SCHEDULE).body)
     Api.season = {:week=>doc.css("games").first["week"],:season=>doc.css("games").first["season"]}
     doc.css("game").each do |g|
       schedule << {:home=>g["home"],:away=>g["away"],:status=>g["status"],

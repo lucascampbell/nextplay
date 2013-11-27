@@ -1,5 +1,5 @@
 <div class="span12">
-	<h3><span id='awayscore'></span>&nbsp;<span id="awayteam"><%=@home.upcase%></span>&nbsp;at&nbsp;<span id='homescore'></span>&nbsp;<span id='hometeam'><%=@away.upcase%></span></h3>
+	<h3><span id='awayscore'></span>&nbsp;<span id="awayteam"><%=@away.upcase%></span>&nbsp;at&nbsp;<span id='hometeam'><%=@home.upcase%></span>&nbsp;<span id='homescore'></span></h3>
 	<div class='subheader well'>
 		<b>Last Play</b><br/>
 		<div id='summary'></div>
@@ -9,10 +9,16 @@
 		<div id='nextplay'></div>
 	</div>
 	<div class='betzone'>
-		<a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>
+    <div id='mybet' class='1'>
+      <p>2 to 1</p>
+		  <a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>
+    </div>
 	</div>
-	<div class='alert alert-warning' style='margin-top:20px'>
-		Your selection:<span class='yourselection'></span>
+	<div class='yourselection' style='margin-top:20px'>
+    <div id='runpass' class='label label-default'></div>
+    <div id='convert' class='label label-success'></div>
+    <div id='bigplay' class='label label-warning'></div>
+    <div id='touchdown' class='label label-info'></div>
 	</div>
 	<div class='alert alert-success' style='margin-top:20px'>
 		Your score:<span class='yourscore'>0</span>
@@ -20,8 +26,12 @@
 </div>
 
 <script type='text/javascript'>
-  var socket = io.connect('http://localhost:3003');
-  socket.on('<%=@home%>/<%=@away%>', function (data) {
+  //odds and 3rd down will be returned from server
+  odds = "2 to 1";
+  third_down = false;
+  redzone = false;
+  var socket = io.connect('http://localhost:8888');
+  socket.on('<%=@home%>-<%=@away%>', function (data) {
   console.log(data);
   $("#awayscore").html(data.awayscore);
   $("#homescore").html(data.homescore);
@@ -40,12 +50,101 @@
   });
   $("#run").click(function(e){
   	e.preventDefault();
-  	$(".yourselection").html("Run");
+  	$("#runpass").html("Run");
   	return false;
   })
   $("#pass").click(function(e){
   	e.preventDefault();
-  	$(".yourselection").html("Pass");
+  	$("#runpass").html("Pass");
   	return false;
   })
+  $(".label").swipe({
+    //remove from list
+    doubleTap:function(event,target){
+      alert("double");
+      $(this).html("");
+    }
+  })
+
+  $(".label").dblclick(function(e){
+    $(this).html("");
+  })
+
+  $(".betzone").swipe({
+  swipeRight:function(event,direction,distance,duration,fingerCount){
+    //go back if possible
+    var bet = $("#mybet").attr("class");
+    go_to_bet(bet,"back");
+  },
+  swipeLeft:function(event,direction,distance,duration,fingerCount){
+    //go forward if possible
+    var bet = $("#mybet").attr("class");
+    go_to_bet(bet,"forward");
+   
+  },
+  threshold:0
+});
+  function go_to_bet(bet,direction){
+    var str = "<div id='mybet' class='1'>";
+    switch(bet)
+    {
+      case "1":
+        //run pass bet
+        if(direction == "forward"){
+          if(third_down === true){
+            str += "<p>"+odds+"</p><a class='btn btn-primary' id='convertbutton'>Convert</a>&nbsp;<a class='btn btn-info' id='noconvert'>No Conversion</a>";
+             new_bet = "2";
+          }
+          else{
+            str += "<p>"+odds+"</p><a class='btn btn-primary' id='bigplaybutton'>Big Play</a>";
+             new_bet = "3";
+          }
+        }
+        break;
+      case "2":
+        //convert bet
+        if(direction == "forward"){
+          str += "<p>"+odds+"</p><a class='btn btn-primary' id='bigplaybutton'>Big Play</a>";
+           new_bet = "3";
+        }
+        else{
+          str += "<p>"+odds+"</p><a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>";
+           new_bet = "1";
+        }
+        break;
+      case "3":
+        //big play bet
+        if(direction == "forward"){
+          if(redzone == true){
+            str += "<p>"+odds+"</p><a class='btn btn-primary' id='touchdownbutton'>TouchDown</a>";
+             new_bet = "4";
+          }
+        }
+        else{
+          if(third_down === true){
+            str += "<p>"+odds+"</p><a class='btn btn-primary' id='convertbutton'>Convert</a>&nbsp;<a class='btn btn-info' id='noconvert'>No Conversion</a>";
+             new_bet =  "3";
+          }
+          else{
+            str += "<p>"+odds+"</p><a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>";
+             new_bet =  "2";
+          }
+        }
+        break;
+      case "4":
+        if(direction == "back"){
+          str += "<p>"+odds+"</p><a class='btn btn-primary' id='bigplaybutton'>Big Play</a>";
+           new_bet = "3"
+        }
+        break;
+      default:
+        str += "<p>"+odds+"</p><a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>";
+        new_bet = "1";
+    }
+    str += "</div>";
+    if(str.length > 40){
+      $("#mybet").replaceWith(str);
+      $("#mybet").attr("class",new_bet);
+    }
+  }
 </script>
