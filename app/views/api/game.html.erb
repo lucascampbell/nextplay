@@ -11,7 +11,7 @@
 	<div class='betzone'>
     <div id='mybet' class='1'>
       <p>2 to 1</p>
-		  <a class='btn btn-primary' id='run'>Run</a>&nbsp;<a class='btn btn-info' id='pass'>Pass</a>
+		  <a class='btn btn-primary' id='run'>rush</a>&nbsp;<a class='btn btn-info' id='pass'>pass</a>
     </div>
 	</div>
 	<div class='yourselection' style='margin-top:20px'>
@@ -30,32 +30,34 @@
   odds = "2 to 1";
   third_down = false;
   redzone = false;
-  var socket = io.connect('http://localhost:8888');
+  var score = 0;
+  var socket = io.connect('http://192.168.150.106:8888');
   socket.on('<%=@home%>-<%=@away%>', function (data) {
-  console.log(data);
-  $("#awayscore").html(data.awayscore);
-  $("#homescore").html(data.homescore);
-  $("#summary").html(data.previousplay);
-  $("#nextplay").html(data.nextplay);
-  var score = $("#yourscore").html();
-	var yourselection = $("#yourselection").html();
-	if((data.play == 'rush' || data.play == 'pass') && yourselection !== undefined){
-	  if(data.play == yourselection)
-			$("#yourselection").html(yourselection + 2);
-		else
-			$("#yourselection").html(yourselection - 1);
-		$("#yourselection").html("");
-	}
-    //socket.emit('my other event', { my: 'data' });
+    $("#awayscore").html(data.awayscore);
+    $("#homescore").html(data.homescore);
+    $("#summary").html(data.previousplay);
+    var np = data.team + " ball, " + data.nextplay;
+    $("#nextplay").html(np);
+    var score = $("#yourscore").html();
+  	var yourselection = $("#runpass").html();
+  	if((data.play == 'rush' || data.play == 'pass') && yourselection.length > 0){
+      score = parseInt($(".yourscore").html());
+  	  if(data.play == yourselection)
+  			$(".yourscore").html(score + 2);
+  		else
+  			$(".yourscore").html(score - 1);
+  		$("#runpass").html("");
+  	}
+      //socket.emit('my other event', { my: 'data' });
   });
   $("#run").click(function(e){
   	e.preventDefault();
-  	$("#runpass").html("Run");
+  	$("#runpass").html("rush");
   	return false;
   })
   $("#pass").click(function(e){
   	e.preventDefault();
-  	$("#runpass").html("Pass");
+  	$("#runpass").html("pass");
   	return false;
   })
   $(".label").swipe({
